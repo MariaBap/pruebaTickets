@@ -33,3 +33,6 @@ Thumbs.db
 # Scratch
 prueba.txt
 
+
+# Cliente de Prisma generado
+apps/backend/generated/
