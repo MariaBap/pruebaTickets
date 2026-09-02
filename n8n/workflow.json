@@ -1,0 +1,92 @@
+{
+  "id": "crazySupportHub1",
+  "name": "CrazySupportHub - Clasificacion de tickets",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ticket-created",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "11111111-1111-4111-8111-111111111111",
+      "name": "Webhook: ticket creado",
+      "webhookId": "22222222-2222-4222-8222-222222222222"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ---------------------------------------------------------------------------\n// CrazySupportHub - clasificacion por reglas.\n// Calibrado contra los tickets ya enriquecidos de tickets-seed.json.\n// ---------------------------------------------------------------------------\n\n// El webhook entrega el cuerpo en `body`; si se invoca el nodo suelto, en la raiz.\nconst input = $input.first().json;\nconst ticket = input.body ?? input;\n\nconst ticketId = Number(ticket.ticketId);\nif (!Number.isInteger(ticketId) || ticketId <= 0) {\n  throw new Error('Payload invalido: falta un ticketId numerico.');\n}\n\n// Se normaliza a minusculas y sin tildes para que las reglas no dependan\n// de como el usuario escribio el acento.\nconst normalize = (value) =>\n  String(value ?? '')\n    .toLowerCase()\n    .normalize('NFD')\n    .replace(/[\\u0300-\\u036f]/g, '');\n\nconst text = `${normalize(ticket.title)} ${normalize(ticket.description)}`;\nconst has = (...needles) => needles.some((n) => text.includes(n));\n\n// --- Categoria -------------------------------------------------------------\n// El orden importa: \"consulta sobre planes y precios\" contiene la palabra\n// \"precios\" pero es una pregunta comercial, no un problema de facturacion.\n// Por eso las senales de \"other\" se evaluan primero.\nlet category;\nif (has('sugerencia', 'feedback', 'me encantaria', 'estoy evaluando', 'consulta sobre', 'comparativa')) {\n  category = 'other';\n} else if (\n  has('factura', 'facturacion', 'cobro', 'cargo', 'reembolso', 'suscripcion',\n      'ciclo de cobro', 'dar de baja', 'plan pro', 'tarjeta', 'datos fiscales')\n) {\n  category = 'billing';\n} else if (\n  has('error', 'falla', 'fallo', 'crash', 'se cierra', 'se cae', 'no carga', 'no funciona',\n      'no recibo', 'notificacion', 'exportar', 'dashboard', 'pantalla', 'lento', 'bug', '500')\n) {\n  category = 'technical';\n} else if (\n  has('cuenta', 'email', 'correo', 'contrasena', 'usuario', 'perfil', 'acceso', 'restablecer')\n) {\n  category = 'account';\n} else {\n  category = 'other';\n}\n\n// --- Prioridad -------------------------------------------------------------\n// \"se cierra sola\" aparece tanto en un crash puntual como en la expulsion\n// constante de sesion, asi que no sirve para distinguir urgencia. Lo que\n// separa urgente de medio es la recurrencia y el bloqueo total.\nlet priority;\nif (has('urgente', 'constantemente', 'cada pocos minutos', 'todo el tiempo', 'no puedo trabajar',\n        'todos los usuarios', 'caido', 'inaccesible', 'perdida de datos')) {\n  priority = 'urgent';\n} else if (has('duplicad', 'error 500', 'error del servidor', 'no puedo acceder', 'fraude', 'cobro indebido')) {\n  priority = 'high';\n} else if (has('sugerencia', 'consulta', 'duda', 'me encantaria', 'como procedo', 'quisiera saber',\n               'me gustaria', 'solicito', 'estoy evaluando')) {\n  priority = 'low';\n} else {\n  priority = 'medium';\n}\n\n// --- Tags ------------------------------------------------------------------\n// Etiquetas derivadas de lo que realmente aparecio en el texto, al estilo de\n// las del seed. Se limitan a 4 para que sigan siendo utiles como filtro.\nconst TAG_RULES = [\n  ['factura', 'facturacion'],  ['cobro', 'facturacion'],   ['cargo', 'facturacion'],\n  ['reembolso', 'reembolso'],  ['duplicad', 'duplicado'],  ['suscripcion', 'suscripcion'],\n  ['dar de baja', 'cancelacion'], ['datos fiscales', 'datos-fiscales'],\n  ['android', 'android'],      ['iphone', 'ios'],          ['crash', 'crash'],\n  ['se cierra', 'crash'],      ['error 500', 'server-error'], ['exportar', 'export'],\n  ['pdf', 'pdf'],              ['dashboard', 'dashboard'], ['no carga', 'no-carga'],\n  ['sesion', 'sesion'],        ['contrasena', 'password'], ['email', 'email'],\n  ['correo', 'email'],         ['cuenta', 'cuenta'],       ['notificacion', 'notificaciones'],\n  ['sugerencia', 'feedback'],  ['planes', 'planes'],       ['precios', 'planes'],\n];\n\nconst tags = [];\nfor (const [needle, tag] of TAG_RULES) {\n  if (text.includes(needle) && !tags.includes(tag)) tags.push(tag);\n  if (tags.length === 4) break;\n}\nif (tags.length === 0) tags.push(category);\n\nreturn [{ json: { ticketId, priority, category, tags } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "33333333-3333-4333-8333-333333333333",
+      "name": "Clasificar por reglas"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BACKEND_CALLBACK_URL }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Webhook-Secret",
+              "value": "={{ $env.N8N_WEBHOOK_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ],
+      "id": "44444444-4444-4444-8444-444444444444",
+      "name": "Callback a la API"
+    }
+  ],
+  "connections": {
+    "Webhook: ticket creado": {
+      "main": [
+        [
+          {
+            "node": "Clasificar por reglas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clasificar por reglas": {
+      "main": [
+        [
+          {
+            "node": "Callback a la API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {},
+  "tags": []
+}
