@@ -53,6 +53,26 @@ responde 404.
 Desde la interfaz (`http://localhost:5678`): **Workflows → … → Import from File**,
 y luego activarlo con el interruptor de la esquina superior derecha.
 
+## La cuenta de n8n
+
+n8n **no requiere ningún registro externo**: ni cuenta en n8n.io, ni licencia,
+ni API key. Todo corre self-hosted en el contenedor.
+
+Lo que sí pide es una **cuenta de propietario local** la primera vez que abres
+`http://localhost:5678`. Es un email y una contraseña cualesquiera, guardados
+en la base SQLite del propio contenedor. Invéntatelos: no hay credenciales de
+n8n documentadas en este repo porque no hacen falta para que la entrega
+funcione.
+
+Dos cosas verificadas al respecto:
+
+- **El workflow clasifica sin que exista ninguna cuenta.** El flujo se importa,
+  se publica y atiende el webhook por CLI; la cuenta solo sirve para abrir el
+  editor y mirar el flujo.
+- **Crear la cuenta después no oculta el workflow importado.** Tras el alta del
+  propietario, `crazySupportHub1` sigue listado, activo, y el webhook sigue
+  respondiendo 200.
+
 ## Reglas de clasificación
 
 Están calibradas contra los 8 tickets que `tickets-seed.json` ya trae
