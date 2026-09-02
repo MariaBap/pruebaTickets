@@ -5,15 +5,7 @@ import { Layout } from './components/Layout';
 import LoginPage from './pages/LoginPage';
 import TicketsPage from './pages/TicketsPage';
 import NewTicketPage from './pages/NewTicketPage';
-
-function Placeholder({ title }: { title: string }) {
-  return (
-    <div className="card" style={{ padding: '1.5rem' }}>
-      <h1>{title}</h1>
-      <p className="muted">Pantalla en construcción.</p>
-    </div>
-  );
-}
+import TicketDetailPage from './pages/TicketDetailPage';
 
 export default function App() {
   return (
@@ -25,7 +17,7 @@ export default function App() {
           <Route element={<Layout />}>
             <Route path="/tickets" element={<TicketsPage />} />
             <Route path="/tickets/nuevo" element={<NewTicketPage />} />
-            <Route path="/tickets/:id" element={<Placeholder title="Detalle" />} />
+            <Route path="/tickets/:id" element={<TicketDetailPage />} />
           </Route>
         </Route>
 

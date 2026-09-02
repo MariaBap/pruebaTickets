@@ -174,3 +174,7 @@ a { color: var(--brand); }
   font-weight: 500;
 }
 .link-cell:hover { color: var(--brand); text-decoration: underline; }
+
+@media (max-width: 820px) {
+  .detail-grid { grid-template-columns: 1fr !important; }
+}
