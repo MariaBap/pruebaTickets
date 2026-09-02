@@ -4,6 +4,7 @@ import { ProtectedRoute } from './auth/ProtectedRoute';
 import { Layout } from './components/Layout';
 import LoginPage from './pages/LoginPage';
 import TicketsPage from './pages/TicketsPage';
+import NewTicketPage from './pages/NewTicketPage';
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -23,7 +24,7 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/tickets" element={<TicketsPage />} />
-            <Route path="/tickets/nuevo" element={<Placeholder title="Nuevo ticket" />} />
+            <Route path="/tickets/nuevo" element={<NewTicketPage />} />
             <Route path="/tickets/:id" element={<Placeholder title="Detalle" />} />
           </Route>
         </Route>
