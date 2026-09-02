@@ -10,15 +10,15 @@ import { Transform } from 'class-transformer';
  * `status` tampoco: un ticket nace siempre en `open`.
  */
 export class CreateTicketDto {
-  @IsString({ message: 'El titulo es obligatorio.' })
-  @MinLength(5, { message: 'El titulo debe tener al menos 5 caracteres.' })
-  @MaxLength(200, { message: 'El titulo no puede superar los 200 caracteres.' })
+  @IsString({ message: 'El título es obligatorio.' })
+  @MinLength(5, { message: 'El título debe tener al menos 5 caracteres.' })
+  @MaxLength(200, { message: 'El título no puede superar los 200 caracteres.' })
   @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
   title!: string;
 
-  @IsString({ message: 'La descripcion es obligatoria.' })
-  @MinLength(10, { message: 'La descripcion debe tener al menos 10 caracteres.' })
-  @MaxLength(5000, { message: 'La descripcion no puede superar los 5000 caracteres.' })
+  @IsString({ message: 'La descripción es obligatoria.' })
+  @MinLength(10, { message: 'La descripción debe tener al menos 10 caracteres.' })
+  @MaxLength(5000, { message: 'La descripción no puede superar los 5000 caracteres.' })
   @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
   description!: string;
 

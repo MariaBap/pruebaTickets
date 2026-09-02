@@ -36,7 +36,7 @@ export class EnrichmentCallbackDto {
 
   @IsOptional()
   @IsArray({ message: 'tags debe ser una lista de strings.' })
-  @ArrayMaxSize(20, { message: 'tags no puede tener mas de 20 elementos.' })
+  @ArrayMaxSize(20, { message: 'tags no puede tener más de 20 elementos.' })
   @IsString({ each: true, message: 'cada tag debe ser un string.' })
   @MaxLength(40, { each: true, message: 'cada tag no puede superar los 40 caracteres.' })
   tags?: string[];

@@ -53,7 +53,7 @@ export class N8nDispatcherService {
       });
 
       if (!response.ok) {
-        throw new Error(`n8n respondio ${response.status} ${response.statusText}`);
+        throw new Error(`n8n respondió ${response.status} ${response.statusText}`);
       }
 
       await this.markProcessing(payload.ticketId);

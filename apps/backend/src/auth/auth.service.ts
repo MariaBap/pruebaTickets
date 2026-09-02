@@ -56,7 +56,7 @@ export class AuthService {
 
     // Mismo mensaje para email inexistente y contrasena incorrecta.
     if (!found || !matches) {
-      throw new UnauthorizedException('Credenciales invalidas.');
+      throw new UnauthorizedException('Credenciales inválidas.');
     }
 
     const user: PublicUser = {

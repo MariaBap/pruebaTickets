@@ -83,7 +83,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
           return {
             status: HttpStatus.CONFLICT,
             error: 'Conflict',
-            message: 'Ya existe un registro con ese valor unico.',
+            message: 'Ya existe un registro con ese valor único.',
           };
         case 'P2025':
           return {
@@ -103,7 +103,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     return {
       status: HttpStatus.INTERNAL_SERVER_ERROR,
       error: 'Internal Server Error',
-      message: 'Ocurrio un error inesperado.',
+      message: 'Ocurrió un error inesperado.',
     };
   }
 }

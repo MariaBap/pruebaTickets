@@ -49,7 +49,7 @@ export class ListTicketsQueryDto {
   // --- Busqueda por texto ---------------------------------------------------
   @IsOptional()
   @IsString()
-  @MaxLength(200, { message: 'La busqueda no puede superar los 200 caracteres.' })
+  @MaxLength(200, { message: 'La búsqueda no puede superar los 200 caracteres.' })
   @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
   search?: string;
 
