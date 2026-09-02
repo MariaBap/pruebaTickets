@@ -9,7 +9,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // Un 401 ya lo maneja el interceptor cerrando sesion; reintentarlo solo
-      // retrasa la redireccion al login.
+      // retrasa la redirección al login.
       retry: (failureCount, error) => {
         const status = (error as { response?: { status?: number } }).response?.status;
         if (status && status >= 400 && status < 500) return false;

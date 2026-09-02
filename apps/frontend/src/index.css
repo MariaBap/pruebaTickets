@@ -124,3 +124,5 @@ a { color: var(--brand); }
 .muted { color: var(--text-muted); }
 .stack { display: flex; flex-direction: column; gap: 1rem; }
 .row { display: flex; align-items: center; gap: 0.5rem; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
