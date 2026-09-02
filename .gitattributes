@@ -1,0 +1,15 @@
+# Normaliza finales de linea: LF en el repositorio, nativo en el working copy.
+* text=auto eol=lf
+
+# Estos SIEMPRE con LF: los ejecuta Linux dentro de los contenedores.
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+*.Dockerfile    text eol=lf
+docker-compose*.yml text eol=lf
+
+# Binarios: sin conversion.
+*.pdf  binary
+*.png  binary
+*.jpg  binary
+*.gif  binary
+*.mp4  binary

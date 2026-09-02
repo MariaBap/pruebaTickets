@@ -1,0 +1,35 @@
+# Dependencias
+node_modules/
+
+# Build
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# Entorno — nunca commitear valores reales
+.env
+.env.*
+!.env.example
+
+# Datos persistentes de los contenedores
+docker/volumes/
+n8n-data/
+postgres-data/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Tests
+coverage/
+
+# Editor / SO
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Scratch
+prueba.txt
+
