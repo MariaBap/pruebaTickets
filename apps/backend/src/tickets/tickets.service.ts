@@ -6,10 +6,14 @@ import { TICKET_SELECT, TicketDto } from './ticket.select';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { ListTicketsQueryDto, PaginatedTickets } from './dto/list-tickets.dto';
+import { N8nDispatcherService } from '../n8n/n8n-dispatcher.service';
 
 @Injectable()
 export class TicketsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly n8n: N8nDispatcherService,
+  ) {}
 
   /**
    * Alcance de datos por rol, expresado como fragmento de `where`.
@@ -40,7 +44,7 @@ export class TicketsService {
       throw new ForbiddenException('Solo un admin puede asignar tickets a otros usuarios.');
     }
 
-    return this.prisma.ticket.create({
+    const ticket = await this.prisma.ticket.create({
       data: {
         title: dto.title,
         description: dto.description,
@@ -51,6 +55,17 @@ export class TicketsService {
       },
       select: TICKET_SELECT,
     });
+
+    // El disparo va despues del commit y sin await: el ticket ya existe cuando
+    // n8n pueda responder, y la respuesta al frontend no espera al workflow.
+    this.n8n.dispatch({
+      ticketId: ticket.id,
+      title: ticket.title,
+      description: ticket.description,
+      createdAt: ticket.createdAt.toISOString(),
+    });
+
+    return ticket;
   }
 
   /**
