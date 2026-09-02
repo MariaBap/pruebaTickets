@@ -9,10 +9,12 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { ListTicketsQueryDto, PaginatedTickets } from './dto/list-tickets.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../auth/types/authenticated-user';
 import { TicketDto } from './ticket.select';
@@ -27,8 +29,11 @@ export class TicketsController {
   }
 
   @Get()
-  findAll(@CurrentUser() user: AuthenticatedUser): Promise<TicketDto[]> {
-    return this.tickets.findAll(user);
+  findAll(
+    @Query() query: ListTicketsQueryDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<PaginatedTickets<TicketDto>> {
+    return this.tickets.findAll(query, user);
   }
 
   @Get(':id')

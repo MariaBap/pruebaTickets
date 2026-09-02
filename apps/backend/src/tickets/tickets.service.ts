@@ -5,6 +5,7 @@ import { AuthenticatedUser } from '../auth/types/authenticated-user';
 import { TICKET_SELECT, TicketDto } from './ticket.select';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { ListTicketsQueryDto, PaginatedTickets } from './dto/list-tickets.dto';
 
 @Injectable()
 export class TicketsService {
@@ -52,12 +53,66 @@ export class TicketsService {
     });
   }
 
-  async findAll(user: AuthenticatedUser): Promise<TicketDto[]> {
-    return this.prisma.ticket.findMany({
-      where: this.scopeFor(user),
-      select: TICKET_SELECT,
-      orderBy: { createdAt: 'desc' },
-    });
+  /**
+   * Listado avanzado: filtros, busqueda por texto, paginacion y ordenamiento.
+   *
+   * El alcance por rol y los filtros se componen en el MISMO where, y el conteo
+   * total usa ese where identico, de modo que `total` y `totalPages` describen
+   * lo que ese usuario puede ver y no el total global de la tabla.
+   */
+  async findAll(
+    query: ListTicketsQueryDto,
+    user: AuthenticatedUser,
+  ): Promise<PaginatedTickets<TicketDto>> {
+    const where = this.buildWhere(query, user);
+    const skip = (query.page - 1) * query.limit;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.ticket.findMany({
+        where,
+        select: TICKET_SELECT,
+        orderBy: { [query.sortBy]: query.sortOrder },
+        skip,
+        take: query.limit,
+      }),
+      this.prisma.ticket.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total,
+        totalPages: Math.ceil(total / query.limit),
+      },
+    };
+  }
+
+  private buildWhere(query: ListTicketsQueryDto, user: AuthenticatedUser): Prisma.TicketWhereInput {
+    const filters: Prisma.TicketWhereInput[] = [this.scopeFor(user)];
+
+    if (query.status) filters.push({ status: query.status });
+    if (query.priority) filters.push({ priority: query.priority });
+    if (query.category) filters.push({ category: query.category });
+    if (query.enrichmentStatus) filters.push({ enrichmentStatus: query.enrichmentStatus });
+    if (query.assignedToId !== undefined) filters.push({ assignedToId: query.assignedToId });
+    if (query.createdById !== undefined) filters.push({ createdById: query.createdById });
+
+    if (query.search) {
+      // Busqueda insensible a mayusculas en titulo o descripcion. Va como un
+      // AND separado para que no se mezcle con el OR del alcance por rol: si
+      // ambos OR quedaran al mismo nivel, un agent veria tickets ajenos que
+      // coincidieran con el texto buscado.
+      filters.push({
+        OR: [
+          { title: { contains: query.search, mode: 'insensitive' } },
+          { description: { contains: query.search, mode: 'insensitive' } },
+        ],
+      });
+    }
+
+    return { AND: filters };
   }
 
   /**
