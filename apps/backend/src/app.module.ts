@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { envValidationSchema } from './config/env.validation';
+import { PrismaModule } from './prisma/prisma.module';
 import { HealthModule } from './health/health.module';
 
 @Module({
@@ -10,12 +11,10 @@ import { HealthModule } from './health/health.module';
       isGlobal: true,
       load: [configuration],
       validationSchema: envValidationSchema,
-      validationOptions: {
-        abortEarly: false,
-      },
-      // Busca el .env en la raiz del monorepo y, si no, en el del propio backend.
+      validationOptions: { abortEarly: false },
       envFilePath: ['../../.env', '.env'],
     }),
+    PrismaModule,
     HealthModule,
   ],
 })

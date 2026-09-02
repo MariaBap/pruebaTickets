@@ -1,4 +1,7 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+  // `prisma/` y `test/` quedan fuera del build: si entran en la compilacion,
+  // el rootDir inferido sube de `src/` a la raiz del workspace y la salida
+  // pasa de dist/main.js a dist/src/main.js, rompiendo el arranque en produccion.
+  "exclude": ["node_modules", "test", "dist", "prisma", "generated", "**/*spec.ts"]
 }
