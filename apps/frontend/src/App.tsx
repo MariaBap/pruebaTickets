@@ -3,6 +3,7 @@ import { AuthProvider } from './auth/AuthProvider';
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import { Layout } from './components/Layout';
 import LoginPage from './pages/LoginPage';
+import TicketsPage from './pages/TicketsPage';
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -21,7 +22,7 @@ export default function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
-            <Route path="/tickets" element={<Placeholder title="Tickets" />} />
+            <Route path="/tickets" element={<TicketsPage />} />
             <Route path="/tickets/nuevo" element={<Placeholder title="Nuevo ticket" />} />
             <Route path="/tickets/:id" element={<Placeholder title="Detalle" />} />
           </Route>

@@ -126,3 +126,51 @@ a { color: var(--brand); }
 .row { display: flex; align-items: center; gap: 0.5rem; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* --- Tabla de tickets ---------------------------------------------------- */
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td {
+  text-align: left;
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.table th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  font-weight: 600;
+  background: var(--neutral-bg);
+}
+.table tbody tr:hover { background: #fafbfc; }
+.table tbody tr:last-child td { border-bottom: none; }
+
+.table-scroll { overflow-x: auto; }
+
+.filters {
+  display: grid;
+  grid-template-columns: minmax(200px, 2fr) repeat(3, minmax(130px, 1fr)) auto;
+  gap: 0.65rem;
+  align-items: end;
+}
+@media (max-width: 860px) {
+  .filters { grid-template-columns: 1fr 1fr; }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.link-cell {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+}
+.link-cell:hover { color: var(--brand); text-decoration: underline; }
