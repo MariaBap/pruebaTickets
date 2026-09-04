@@ -298,11 +298,14 @@ describe('Tickets (e2e)', () => {
       let propio: number;
 
       beforeEach(async () => {
+        // Asignado a Bruno, no solo creado por él: desde ahora crear un ticket
+        // no da derecho a mover su estado.
         const ticket = await prisma.ticket.create({
           data: {
-            title: 'Ticket propio de Bruno',
+            title: 'Ticket asignado a Bruno',
             description: DESCRIPCION,
             createdById: users.bruno.id,
+            assignedToId: users.bruno.id,
           },
         });
         propio = ticket.id;
@@ -338,6 +341,72 @@ describe('Tickets (e2e)', () => {
 
       it('rechaza con 400 un estado que no existe', async () => {
         await patch(tokens.bruno, propio, 'pendiente').expect(400);
+      });
+
+      /**
+       * Mover el estado es afirmar algo sobre el trabajo, y quien lo afirma es
+       * quien lo atiende. Haber creado el ticket no da ese derecho.
+       */
+      it('un agente no cambia el estado de un ticket que creó pero no tiene asignado', async () => {
+        const sinAsignar = await prisma.ticket.create({
+          data: {
+            title: 'Ticket creado por Bruno sin asignar',
+            description: DESCRIPCION,
+            createdById: users.bruno.id,
+          },
+        });
+
+        const response = await patch(tokens.bruno, sinAsignar.id, 'in_progress').expect(403);
+        expect(response.body.message).toContain('asignados');
+      });
+
+      it('un agente sí lo cambia en cuanto se le asigna ese mismo ticket', async () => {
+        const ticket = await prisma.ticket.create({
+          data: {
+            title: 'Ticket creado por Bruno sin asignar',
+            description: DESCRIPCION,
+            createdById: users.bruno.id,
+          },
+        });
+
+        await patch(tokens.bruno, ticket.id, 'in_progress').expect(403);
+
+        await request(app.getHttpServer())
+          .patch(`/api/tickets/${ticket.id}`)
+          .set(auth(tokens.admin))
+          .send({ assignedToId: users.bruno.id })
+          .expect(200);
+
+        await patch(tokens.bruno, ticket.id, 'in_progress').expect(200);
+      });
+
+      it('un agente no puede asignarse el ticket y moverlo en la misma petición', async () => {
+        const ticket = await prisma.ticket.create({
+          data: {
+            title: 'Ticket creado por Bruno sin asignar',
+            description: DESCRIPCION,
+            createdById: users.bruno.id,
+          },
+        });
+
+        // La regla mira al responsable ANTES de esta actualización.
+        await request(app.getHttpServer())
+          .patch(`/api/tickets/${ticket.id}`)
+          .set(auth(tokens.bruno))
+          .send({ assignedToId: users.bruno.id, status: 'in_progress' })
+          .expect(403);
+      });
+
+      it('el admin cambia el estado aunque el ticket no sea suyo', async () => {
+        const deCarla = await prisma.ticket.create({
+          data: {
+            title: 'Ticket solo de Carla',
+            description: DESCRIPCION,
+            createdById: users.carla.id,
+          },
+        });
+
+        await patch(tokens.admin, deCarla.id, 'closed').expect(200);
       });
     });
 

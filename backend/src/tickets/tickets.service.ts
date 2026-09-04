@@ -180,6 +180,7 @@ export class TicketsService {
     }
 
     if (dto.status !== undefined) {
+      this.assertCanChangeStatus(current, user);
       this.assertStatusTransition(current.status, dto.status, user);
     }
 
@@ -193,6 +194,30 @@ export class TicketsService {
       },
       select: TICKET_SELECT,
     });
+  }
+
+  /**
+   * Quien puede mover el estado de un ticket.
+   *
+   * Un agent solo lo hace sobre lo que tiene asignado: haberlo creado no basta.
+   * Mover el estado es afirmar algo sobre el trabajo —que esta en curso, que
+   * esta resuelto— y quien lo afirma es quien lo atiende, no quien lo reporto.
+   * Crear y atender son roles distintos aunque coincidan en la misma persona:
+   * si a quien lo creo se le asigna, entonces si puede.
+   *
+   * Se evalua contra el responsable ANTES de esta actualizacion. Un agent no
+   * puede asignarse un ticket y cambiarle el estado en la misma peticion.
+   */
+  private assertCanChangeStatus(ticket: TicketDto, user: AuthenticatedUser): void {
+    if (user.role === Role.admin) {
+      return;
+    }
+
+    if (ticket.assignedTo?.id !== user.id) {
+      throw new ForbiddenException(
+        'Solo puedes cambiar el estado de los tickets que tienes asignados.',
+      );
+    }
   }
 
   /**

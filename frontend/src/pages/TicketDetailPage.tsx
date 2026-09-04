@@ -123,6 +123,8 @@ export default function TicketDetailPage() {
   const updateTicket = useUpdateTicket(ticketId);
   const usersQuery = useUsers(isAdmin);
 
+  const puedeCambiarEstado = isAdmin || ticket?.assignedTo?.id === user?.id;
+
   if (!Number.isInteger(ticketId) || ticketId <= 0) {
     return <ErrorState message="El identificador del ticket no es válido." />;
   }
@@ -183,7 +185,10 @@ export default function TicketDetailPage() {
             <select
               className="select"
               value={ticket.status}
-              disabled={updateTicket.isPending}
+              // Un agente solo mueve el estado de lo que tiene asignado; haberlo
+              // creado no basta. La API rechaza el resto, así que el selector
+              // tampoco lo ofrece.
+              disabled={updateTicket.isPending || !puedeCambiarEstado}
               onChange={(e) => updateTicket.mutate({ status: e.target.value as TicketStatus })}
               aria-label="Cambiar el estado del ticket"
             >
@@ -200,6 +205,12 @@ export default function TicketDetailPage() {
               ))}
             </select>
           </Row>
+
+          {!puedeCambiarEstado && (
+            <p className="hint" style={{ margin: '-0.25rem 0 0.5rem' }}>
+              Solo quien tiene el ticket asignado puede cambiar su estado.
+            </p>
+          )}
 
           <Row label="Asignado a">
             {isAdmin ? (
