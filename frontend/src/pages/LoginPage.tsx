@@ -1,15 +1,13 @@
 import { useState, type FormEvent } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import { getErrorMessage } from '../api/client';
+import { ALLOWED_EMAIL_DOMAIN } from '../api/labels';
 import { FullPageLoader, Spinner } from '../components/States';
 
 interface LocationState {
   from?: string;
 }
-
-/** Las cuentas de la herramienta son internas: solo se admite este dominio. */
-const ALLOWED_DOMAIN = '@crazysupporthub.test';
 
 export default function LoginPage() {
   const { user, loading, login } = useAuth();
@@ -46,7 +44,7 @@ export default function LoginPage() {
       errors.email = 'Campo obligatorio';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       errors.email = 'Escribe un correo válido.';
-    } else if (!value.endsWith(ALLOWED_DOMAIN)) {
+    } else if (!value.endsWith(ALLOWED_EMAIL_DOMAIN)) {
       errors.email = 'Dirección de correo inválida';
     }
 
@@ -171,6 +169,20 @@ export default function LoginPage() {
               'Entrar'
             )}
           </button>
+
+          <Link
+            to="/registro"
+            className="btn btn-secondary"
+            style={{
+              width: '100%',
+              marginTop: '0.6rem',
+              display: 'block',
+              textAlign: 'center',
+              textDecoration: 'none',
+            }}
+          >
+            Regístrate
+          </Link>
         </form>
       </div>
     </main>

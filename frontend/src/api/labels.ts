@@ -37,6 +37,9 @@ export const ENRICHMENT_LABELS: Record<EnrichmentStatus, string> = {
   failed: 'Fallido',
 };
 
+/** Las cuentas son internas: solo se admite este dominio. La API lo exige también. */
+export const ALLOWED_EMAIL_DOMAIN = '@crazysupporthub.test';
+
 export const ROLE_LABELS: Record<Role, string> = {
   admin: 'administrador',
   agent: 'agente',

@@ -134,6 +134,40 @@ describe('Autenticación (e2e)', () => {
       expect(response.body.message).toContain('property role should not exist');
     });
 
+    /**
+     * La restricción de dominio vive en el DTO y no solo en el formulario: una
+     * validación que solo existe en el navegador se salta con cualquier
+     * cliente HTTP.
+     */
+    it.each([
+      ['dominio ajeno', 'alguien@gmail.com'],
+      ['dominio parecido', 'alguien@crazysupporthub.test.malo.com'],
+      ['dominio con el punto cambiado', 'alguien@crazysupporthubXtest'],
+    ])('rechaza con 400 un correo de %s', async (_caso, email) => {
+      const response = await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send({ name: 'Persona Externa', email, password: 'Prueba1234' })
+        .expect(400);
+
+      expect(response.body.message).toContain('Dirección de correo inválida');
+    });
+
+    it('acepta el dominio permitido escrito en mayúsculas', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send({
+          name: 'Persona Interna',
+          email: 'Persona.Interna@CrazySupportHub.TEST',
+          password: 'Prueba1234',
+        })
+        .expect(201);
+
+      // Se guarda normalizado en minúsculas.
+      await expect(
+        prisma.user.findUnique({ where: { email: 'persona.interna@crazysupporthub.test' } }),
+      ).resolves.not.toBeNull();
+    });
+
     it('responde 409 si el email ya existe', async () => {
       await request(app.getHttpServer())
         .post('/api/auth/register')

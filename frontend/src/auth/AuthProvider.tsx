@@ -46,6 +46,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   }, []);
 
+  const register = useCallback(async (name: string, email: string, password: string) => {
+    const { data } = await api.post<AuthResult>('/auth/register', { name, email, password });
+    // La API ya devuelve un token: quien se registra entra sin volver a escribir
+    // sus credenciales.
+    tokenStorage.set(data.accessToken);
+    setUser(data.user);
+  }, []);
+
   const logout = useCallback(() => {
     tokenStorage.clear();
     setUser(null);
@@ -55,8 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [queryClient]);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ user, loading, login, logout }),
-    [user, loading, login, logout],
+    () => ({ user, loading, login, register, logout }),
+    [user, loading, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
