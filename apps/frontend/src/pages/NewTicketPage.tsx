@@ -9,6 +9,18 @@ import { Spinner } from '../components/States';
 type FieldName = 'title' | 'description' | 'assignedToId';
 type FieldErrors = Partial<Record<FieldName, string>>;
 
+/**
+ * Mínimo de letras que hace informativo a un texto. Misma regla que el backend:
+ * los números son bienvenidos dentro de una frase, pero un campo con solo
+ * números, símbolos o espacios no informa a nadie ni al clasificador de n8n.
+ * `\p{L}` cubre cualquier letra Unicode, tildes y eñes incluidas.
+ */
+const MIN_LETTERS = 3;
+
+function countLetters(value: string): number {
+  return (value.match(/\p{L}/gu) ?? []).length;
+}
+
 /** Límites alineados con los DTO del backend, para avisar antes de enviar. */
 const LIMITS = {
   title: { min: 5, max: 150 },
@@ -75,6 +87,8 @@ export default function NewTicketPage() {
       next.title = `El título debe tener al menos ${LIMITS.title.min} caracteres.`;
     } else if (cleanTitle.length > LIMITS.title.max) {
       next.title = `El título no puede superar los ${LIMITS.title.max} caracteres.`;
+    } else if (countLetters(cleanTitle) < MIN_LETTERS) {
+      next.title = 'El título debe incluir texto, no solo números, espacios o símbolos.';
     }
 
     if (!cleanDescription) {
@@ -83,6 +97,8 @@ export default function NewTicketPage() {
       next.description = `La descripción debe tener al menos ${LIMITS.description.min} caracteres.`;
     } else if (cleanDescription.length > LIMITS.description.max) {
       next.description = `La descripción no puede superar los ${LIMITS.description.max} caracteres.`;
+    } else if (countLetters(cleanDescription) < MIN_LETTERS) {
+      next.description = 'La descripción debe incluir texto, no solo números, espacios o símbolos.';
     }
 
     setErrors(next);

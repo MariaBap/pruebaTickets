@@ -9,6 +9,7 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { HasMeaningfulText } from '../../common/validators/has-meaningful-text.validator';
 import { TicketStatus } from '../../../generated/prisma';
 
 /**
@@ -21,6 +22,9 @@ export class UpdateTicketDto {
   @IsString()
   @MinLength(5, { message: 'El título debe tener al menos 5 caracteres.' })
   @MaxLength(150, { message: 'El título no puede superar los 150 caracteres.' })
+  @HasMeaningfulText({
+    message: 'El título debe incluir texto, no solo números, espacios o símbolos.',
+  })
   @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
   title?: string;
 
@@ -28,6 +32,9 @@ export class UpdateTicketDto {
   @IsString()
   @MinLength(10, { message: 'La descripción debe tener al menos 10 caracteres.' })
   @MaxLength(3000, { message: 'La descripción no puede superar los 3000 caracteres.' })
+  @HasMeaningfulText({
+    message: 'La descripción debe incluir texto, no solo números, espacios o símbolos.',
+  })
   @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
   description?: string;
 
