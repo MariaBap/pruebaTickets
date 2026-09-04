@@ -108,8 +108,7 @@ export default function TicketsPage() {
             <input
               id="search"
               className="input"
-              type="search"
-              placeholder="Título o descripción"
+              type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
@@ -178,7 +177,7 @@ export default function TicketsPage() {
             onClick={clearFilters}
             disabled={!hasFilters}
           >
-            Limpiar
+            Borrar Filtros
           </button>
         </div>
       </div>
@@ -202,7 +201,7 @@ export default function TicketsPage() {
             action={
               hasFilters ? (
                 <button type="button" className="btn btn-secondary" onClick={clearFilters}>
-                  Limpiar filtros
+                  Borrar Filtros
                 </button>
               ) : (
                 <Link className="btn" to="/tickets/nuevo" style={{ textDecoration: 'none' }}>

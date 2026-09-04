@@ -36,12 +36,7 @@ export function CategoryBadge({ category }: { category: TicketCategory | null })
  */
 export function EnrichmentBadge({ status }: { status: EnrichmentStatus }) {
   return (
-    <span
-      className={`badge badge-${status}`}
-      title={`Enriquecimiento: ${ENRICHMENT_LABELS[status]}`}
-    >
-      {ENRICHMENT_LABELS[status]}
-    </span>
+    <span className={`badge badge-${status}`}>{ENRICHMENT_LABELS[status]}</span>
   );
 }
 

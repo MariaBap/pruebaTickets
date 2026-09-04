@@ -21,6 +21,7 @@ export default function LoginPage() {
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   if (loading) return <FullPageLoader label="Comprobando la sesión..." />;
 
@@ -42,14 +43,14 @@ export default function LoginPage() {
     const value = email.trim().toLowerCase();
 
     if (!value) {
-      errors.email = 'El correo es obligatorio.';
+      errors.email = 'Campo obligatorio';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       errors.email = 'Escribe un correo válido.';
     } else if (!value.endsWith(ALLOWED_DOMAIN)) {
       errors.email = `Solo se admiten correos ${ALLOWED_DOMAIN}.`;
     }
 
-    if (!password) errors.password = 'La contraseña es obligatoria.';
+    if (!password) errors.password = 'Campo obligatorio';
 
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -95,7 +96,6 @@ export default function LoginPage() {
               className="input"
               type="email"
               autoComplete="username"
-              placeholder={`usuario${ALLOWED_DOMAIN}`}
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -115,19 +115,46 @@ export default function LoginPage() {
             <label className="label" htmlFor="password">
               Contraseña
             </label>
-            <input
-              id="password"
-              className="input"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                clearFieldError('password');
-              }}
-              aria-invalid={Boolean(fieldErrors.password)}
-              aria-describedby={fieldErrors.password ? 'password-error' : undefined}
-            />
+            {/* El interruptor esta siempre presente, no solo al escribir. */}
+            <div className="input-with-action">
+              <input
+                id="password"
+                className="input"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  clearFieldError('password');
+                }}
+                aria-invalid={Boolean(fieldErrors.password)}
+                aria-describedby={fieldErrors.password ? 'password-error' : undefined}
+              />
+              <button
+                type="button"
+                className="input-action"
+                onClick={() => setShowPassword((current) => !current)}
+                aria-label={showPassword ? 'Ocultar la contraseña' : 'Mostrar la contraseña'}
+                aria-pressed={showPassword}
+                title={showPassword ? 'Ocultar la contraseña' : 'Mostrar la contraseña'}
+              >
+                {showPassword ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none"
+                    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 3l18 18" />
+                    <path d="M10.6 10.6a2 2 0 002.8 2.8" />
+                    <path d="M9.4 5.2A9.5 9.5 0 0112 5c5 0 9 4.5 9 7 0 .9-.6 2.1-1.6 3.3" />
+                    <path d="M6.2 6.7C3.9 8.2 3 10.3 3 12c0 2.5 4 7 9 7 1.4 0 2.6-.3 3.7-.8" />
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none"
+                    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z" />
+                    <circle cx="12" cy="12" r="2.5" />
+                  </svg>
+                )}
+              </button>
+            </div>
             {fieldErrors.password && (
               <span className="field-error" id="password-error">
                 {fieldErrors.password}

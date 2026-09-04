@@ -3,7 +3,7 @@ import { useTicket, useUpdateTicket, useUsers } from '../api/tickets';
 import { getErrorMessage } from '../api/client';
 import { useAuth } from '../auth/useAuth';
 import { ENRICHMENT_LABELS, STATUS_LABELS, STATUS_VALUES, formatDate } from '../api/labels';
-import type { EnrichmentStatus, Ticket, TicketStatus } from '../api/types';
+import type { Ticket, TicketStatus } from '../api/types';
 import { ErrorState, FullPageLoader, Spinner } from '../components/States';
 import {
   CategoryBadge,
@@ -12,15 +12,6 @@ import {
   StatusBadge,
   Tags,
 } from '../components/Badges';
-
-/** Copia que explica cada estado del enriquecimiento en términos del proceso. */
-const ENRICHMENT_HELP: Record<EnrichmentStatus, string> = {
-  pending: 'El ticket se ha guardado y está esperando a que n8n lo recoja.',
-  processing: 'n8n ha recibido el ticket y lo está clasificando.',
-  done: 'n8n devolvió la clasificación.',
-  failed:
-    'No se pudo completar el enriquecimiento: n8n no respondió o devolvió un error. El ticket es válido y se puede gestionar a mano.',
-};
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -54,10 +45,6 @@ function EnrichmentPanel({ ticket }: { ticket: Ticket }) {
         <EnrichmentBadge status={ticket.enrichmentStatus} />
       </div>
 
-      <p className="muted" style={{ marginTop: 0 }}>
-        {ENRICHMENT_HELP[ticket.enrichmentStatus]}
-      </p>
-
       {waiting ? (
         <div
           className="row"
@@ -70,7 +57,7 @@ function EnrichmentPanel({ ticket }: { ticket: Ticket }) {
           }}
         >
           <Spinner />
-          <span>Esperando la clasificación de n8n… esta vista se actualiza sola.</span>
+          <span>Esperando la clasificación de n8n…</span>
         </div>
       ) : ticket.enrichmentStatus === 'failed' ? (
         <div className="alert" role="alert">

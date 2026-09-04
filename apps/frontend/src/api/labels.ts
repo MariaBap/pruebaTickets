@@ -27,7 +27,7 @@ export const CATEGORY_LABELS: Record<TicketCategory, string> = {
 export const ENRICHMENT_LABELS: Record<EnrichmentStatus, string> = {
   pending: 'Pendiente',
   processing: 'Procesando',
-  done: 'Enriquecido',
+  done: 'Listo',
   failed: 'Fallido',
 };
 

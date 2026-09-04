@@ -67,7 +67,7 @@ a { color: var(--brand); }
   transition: background 0.12s ease;
 }
 .btn:hover:not(:disabled) { background: var(--brand-hover); }
-.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn:disabled { opacity: 0.55; cursor: default; }
 
 .btn-secondary {
   background: var(--surface);
@@ -236,3 +236,31 @@ a { color: var(--brand); }
 
 /* La descripcion no se redimensiona a mano: solo scroll vertical si hace falta. */
 .textarea { resize: none; overflow-y: auto; }
+
+/* --- Campo con accion incrustada (ver contraseña) ------------------------ */
+.input-with-action { position: relative; display: flex; }
+.input-with-action .input { padding-right: 2.5rem; }
+
+.input-action {
+  position: absolute;
+  top: 50%;
+  right: 0.35rem;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+}
+.input-action:hover { background: var(--neutral-bg); color: var(--text); }
+.input-action:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+
+/* Edge y Chrome añaden su propio ojo en los campos de contraseña; sobra
+   teniendo el nuestro, que además está siempre visible. */
+.input::-ms-reveal,
+.input::-ms-clear { display: none; }
