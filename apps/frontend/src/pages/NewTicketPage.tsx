@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCreateTicket, useUsers } from '../api/tickets';
 import { getErrorMessage, getFieldErrors } from '../api/client';
 import { useAuth } from '../auth/useAuth';
+import { ROLE_LABELS } from '../api/labels';
 import { Spinner } from '../components/States';
 
 type FieldName = 'title' | 'description' | 'assignedToId';
@@ -185,7 +186,7 @@ export default function NewTicketPage() {
           {isAdmin && (
             <div className="field">
               <label className="label" htmlFor="assignedToId">
-                Asignar a <span className="muted">(opcional)</span>
+                Asignar a
               </label>
               <select
                 id="assignedToId"
@@ -202,7 +203,7 @@ export default function NewTicketPage() {
                 <option value="">Sin asignar</option>
                 {usersQuery.data?.map((candidate) => (
                   <option key={candidate.id} value={candidate.id}>
-                    {candidate.name} ({candidate.role})
+                    {candidate.name} ({ROLE_LABELS[candidate.role]})
                   </option>
                 ))}
               </select>

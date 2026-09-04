@@ -1,12 +1,31 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, Role } from '../../generated/prisma';
+import { Prisma, Role, TicketStatus } from '../../generated/prisma';
 import { AuthenticatedUser } from '../auth/types/authenticated-user';
 import { TICKET_SELECT, TicketDto } from './ticket.select';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { ListTicketsQueryDto, PaginatedTickets } from './dto/list-tickets.dto';
 import { N8nDispatcherService } from '../n8n/n8n-dispatcher.service';
+
+/**
+ * Transiciones de estado permitidas a un agent.
+ *
+ * El flujo de trabajo de un agente avanza en un solo sentido: recoge un ticket
+ * abierto, lo trabaja y lo resuelve. Cerrar es una decision de cierre
+ * administrativo, y deshacer un estado ya alcanzado tambien, asi que ambas
+ * quedan reservadas al admin, que puede pasar de cualquier estado a cualquier
+ * otro.
+ *
+ * Reenviar el estado que el ticket ya tiene siempre se admite: un PATCH que no
+ * cambia nada no deberia fallar.
+ */
+const AGENT_TRANSITIONS: Record<TicketStatus, TicketStatus[]> = {
+  [TicketStatus.open]: [TicketStatus.in_progress],
+  [TicketStatus.in_progress]: [TicketStatus.resolved],
+  [TicketStatus.resolved]: [],
+  [TicketStatus.closed]: [],
+};
 
 @Injectable()
 export class TicketsService {
@@ -149,7 +168,7 @@ export class TicketsService {
 
   async update(id: number, dto: UpdateTicketDto, user: AuthenticatedUser): Promise<TicketDto> {
     // Comprueba existencia y alcance con las mismas reglas que la lectura.
-    await this.findOne(id, user);
+    const current = await this.findOne(id, user);
 
     if (
       dto.assignedToId !== undefined &&
@@ -158,6 +177,10 @@ export class TicketsService {
       dto.assignedToId !== user.id
     ) {
       throw new ForbiddenException('Solo un admin puede asignar tickets a otros usuarios.');
+    }
+
+    if (dto.status !== undefined) {
+      this.assertStatusTransition(current.status, dto.status, user);
     }
 
     return this.prisma.ticket.update({
@@ -170,6 +193,31 @@ export class TicketsService {
       },
       select: TICKET_SELECT,
     });
+  }
+
+  /**
+   * Regla de transicion de estado segun el rol. Vive en el servicio y no en el
+   * DTO porque depende del estado actual del ticket y de quien lo pide, cosas
+   * que un DTO no conoce.
+   */
+  private assertStatusTransition(
+    from: TicketStatus,
+    to: TicketStatus,
+    user: AuthenticatedUser,
+  ): void {
+    if (user.role === Role.admin || from === to) {
+      return;
+    }
+
+    if (to === TicketStatus.closed) {
+      throw new ForbiddenException('Solo un admin puede cerrar un ticket.');
+    }
+
+    if (!AGENT_TRANSITIONS[from].includes(to)) {
+      throw new ForbiddenException(
+        `No puedes pasar un ticket de "${from}" a "${to}". Un agente avanza open, in_progress y resolved en ese orden.`,
+      );
+    }
   }
 
   /**

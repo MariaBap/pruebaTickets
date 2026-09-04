@@ -56,7 +56,7 @@ export class AuthService {
 
     // Mismo mensaje para email inexistente y contrasena incorrecta.
     if (!found || !matches) {
-      throw new UnauthorizedException('Correo o contraseña equivocado');
+      throw new UnauthorizedException('Correo o contraseña equivocados');
     }
 
     const user: PublicUser = {

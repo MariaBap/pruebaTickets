@@ -1,7 +1,13 @@
 // Etiquetas en español para los enums del contrato.
 // Los valores que viajan a la API siguen siendo los del enunciado.
 
-import type { EnrichmentStatus, TicketCategory, TicketPriority, TicketStatus } from './types';
+import type {
+  EnrichmentStatus,
+  Role,
+  TicketCategory,
+  TicketPriority,
+  TicketStatus,
+} from './types';
 
 export const STATUS_LABELS: Record<TicketStatus, string> = {
   open: 'Abierto',
@@ -30,6 +36,27 @@ export const ENRICHMENT_LABELS: Record<EnrichmentStatus, string> = {
   done: 'Listo',
   failed: 'Fallido',
 };
+
+export const ROLE_LABELS: Record<Role, string> = {
+  admin: 'administrador',
+  agent: 'agente',
+};
+
+/**
+ * Transiciones que la API admite a un agente. Se repiten aquí para poder
+ * deshabilitar las opciones imposibles en el selector, pero la regla que manda
+ * es la del backend: esto solo evita ofrecer algo que va a devolver 403.
+ */
+export const AGENT_TRANSITIONS: Record<TicketStatus, TicketStatus[]> = {
+  open: ['in_progress'],
+  in_progress: ['resolved'],
+  resolved: [],
+  closed: [],
+};
+
+export function canAgentMoveTo(from: TicketStatus, to: TicketStatus): boolean {
+  return from === to || AGENT_TRANSITIONS[from].includes(to);
+}
 
 export const STATUS_VALUES = Object.keys(STATUS_LABELS) as TicketStatus[];
 export const PRIORITY_VALUES = Object.keys(PRIORITY_LABELS) as TicketPriority[];

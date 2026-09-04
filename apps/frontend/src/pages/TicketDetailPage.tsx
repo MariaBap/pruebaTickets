@@ -2,7 +2,14 @@ import { Link, useParams } from 'react-router-dom';
 import { useTicket, useUpdateTicket, useUsers } from '../api/tickets';
 import { getErrorMessage } from '../api/client';
 import { useAuth } from '../auth/useAuth';
-import { ENRICHMENT_LABELS, STATUS_LABELS, STATUS_VALUES, formatDate } from '../api/labels';
+import {
+  ENRICHMENT_LABELS,
+  ROLE_LABELS,
+  STATUS_LABELS,
+  STATUS_VALUES,
+  canAgentMoveTo,
+  formatDate,
+} from '../api/labels';
 import type { Ticket, TicketStatus } from '../api/types';
 import { ErrorState, FullPageLoader, Spinner } from '../components/States';
 import {
@@ -181,7 +188,13 @@ export default function TicketDetailPage() {
               aria-label="Cambiar el estado del ticket"
             >
               {STATUS_VALUES.map((value) => (
-                <option key={value} value={value}>
+                <option
+                  key={value}
+                  value={value}
+                  // Un agente avanza open, in_progress y resolved en ese orden,
+                  // y no puede cerrar. Se deshabilita lo que la API rechazaria.
+                  disabled={!isAdmin && !canAgentMoveTo(ticket.status, value)}
+                >
                   {STATUS_LABELS[value]}
                 </option>
               ))}
@@ -204,7 +217,7 @@ export default function TicketDetailPage() {
                 <option value="">Sin asignar</option>
                 {usersQuery.data?.map((candidate) => (
                   <option key={candidate.id} value={candidate.id}>
-                    {candidate.name}
+                    {candidate.name} ({ROLE_LABELS[candidate.role]})
                   </option>
                 ))}
               </select>
@@ -221,12 +234,6 @@ export default function TicketDetailPage() {
           <Row label="Enriquecimiento">
             <span className="muted">{ENRICHMENT_LABELS[ticket.enrichmentStatus]}</span>
           </Row>
-
-          {updateTicket.isPending && (
-            <div className="row muted" style={{ marginTop: '0.5rem' }}>
-              <Spinner /> <span style={{ marginLeft: '0.5rem' }}>Guardando…</span>
-            </div>
-          )}
         </div>
       </div>
 

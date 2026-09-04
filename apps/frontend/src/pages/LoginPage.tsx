@@ -47,7 +47,7 @@ export default function LoginPage() {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       errors.email = 'Escribe un correo válido.';
     } else if (!value.endsWith(ALLOWED_DOMAIN)) {
-      errors.email = 'Dirección de correo invalida';
+      errors.email = 'Dirección de correo inválida';
     }
 
     if (!password) errors.password = 'Campo obligatorio';
