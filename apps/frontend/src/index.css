@@ -178,3 +178,61 @@ a { color: var(--brand); }
 @media (max-width: 820px) {
   .detail-grid { grid-template-columns: 1fr !important; }
 }
+
+/* --- Menu de usuario ----------------------------------------------------- */
+.user-menu { position: relative; }
+
+.user-menu-trigger {
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.user-menu-trigger:hover { background: var(--neutral-bg); }
+.user-menu-trigger[aria-expanded='true'] { background: var(--neutral-bg); }
+
+.user-menu-caret { transition: transform 0.15s ease; }
+.user-menu-trigger[aria-expanded='true'] .user-menu-caret { transform: rotate(180deg); }
+
+.user-menu-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  min-width: 180px;
+  padding: 0.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 20px rgba(16, 24, 40, 0.12);
+  z-index: 20;
+}
+
+.user-menu-item {
+  font: inherit;
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.user-menu-item:hover { background: var(--neutral-bg); }
+
+/* --- Volver -------------------------------------------------------------- */
+.back-bar {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+
+/* La descripcion no se redimensiona a mano: solo scroll vertical si hace falta. */
+.textarea { resize: none; overflow-y: auto; }

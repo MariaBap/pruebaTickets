@@ -95,7 +95,7 @@ export default function TicketsPage() {
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <h1>Tickets</h1>
         <Link className="btn" to="/tickets/nuevo" style={{ textDecoration: 'none' }}>
-          Nuevo ticket
+          Nuevo Ticket
         </Link>
       </div>
 
@@ -206,7 +206,7 @@ export default function TicketsPage() {
                 </button>
               ) : (
                 <Link className="btn" to="/tickets/nuevo" style={{ textDecoration: 'none' }}>
-                  Nuevo ticket
+                  Nuevo Ticket
                 </Link>
               )
             }
@@ -217,7 +217,7 @@ export default function TicketsPage() {
               <table className="table">
                 <thead>
                   <tr>
-                    <th style={{ width: '32%' }}>Título</th>
+                    <th style={{ width: '32%' }}></th>
                     <th>Estado</th>
                     <th>Prioridad</th>
                     <th>Categoría</th>

@@ -8,6 +8,9 @@ interface LocationState {
   from?: string;
 }
 
+/** Las cuentas de la herramienta son internas: solo se admite este dominio. */
+const ALLOWED_DOMAIN = '@crazysupporthub.test';
+
 export default function LoginPage() {
   const { user, loading, login } = useAuth();
   const navigate = useNavigate();
@@ -36,9 +39,18 @@ export default function LoginPage() {
 
   function validate(): boolean {
     const errors: typeof fieldErrors = {};
-    if (!email.trim()) errors.email = 'El email es obligatorio.';
-    else if (!/^\S+@\S+\.\S+$/.test(email.trim())) errors.email = 'Escribe un email válido.';
+    const value = email.trim().toLowerCase();
+
+    if (!value) {
+      errors.email = 'El correo es obligatorio.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      errors.email = 'Escribe un correo válido.';
+    } else if (!value.endsWith(ALLOWED_DOMAIN)) {
+      errors.email = `Solo se admiten correos ${ALLOWED_DOMAIN}.`;
+    }
+
     if (!password) errors.password = 'La contraseña es obligatoria.';
+
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   }
@@ -76,13 +88,14 @@ export default function LoginPage() {
 
           <div className="field">
             <label className="label" htmlFor="email">
-              Email
+              Correo
             </label>
             <input
               id="email"
               className="input"
               type="email"
               autoComplete="username"
+              placeholder={`usuario${ALLOWED_DOMAIN}`}
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);

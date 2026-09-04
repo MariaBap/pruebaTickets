@@ -20,14 +20,14 @@ export class UpdateTicketDto {
   @IsOptional()
   @IsString()
   @MinLength(5, { message: 'El título debe tener al menos 5 caracteres.' })
-  @MaxLength(200, { message: 'El título no puede superar los 200 caracteres.' })
+  @MaxLength(150, { message: 'El título no puede superar los 150 caracteres.' })
   @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
   title?: string;
 
   @IsOptional()
   @IsString()
   @MinLength(10, { message: 'La descripción debe tener al menos 10 caracteres.' })
-  @MaxLength(5000, { message: 'La descripción no puede superar los 5000 caracteres.' })
+  @MaxLength(3000, { message: 'La descripción no puede superar los 3000 caracteres.' })
   @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
   description?: string;
 

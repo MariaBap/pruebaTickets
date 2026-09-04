@@ -138,21 +138,21 @@ export default function TicketDetailPage() {
   if (isError) {
     return (
       <div className="stack">
-        <Link to="/tickets">← Volver a la lista</Link>
         <ErrorState
           message={getErrorMessage(error, 'No se pudo cargar el ticket.')}
           onRetry={() => void refetch()}
         />
+        <div className="back-bar">
+          <Link to="/tickets" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
+            ← Volver
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="stack">
-      <div>
-        <Link to="/tickets">← Volver a la lista</Link>
-      </div>
-
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <h1 style={{ maxWidth: '70%' }}>{ticket.title}</h1>
         <span className="muted">#{ticket.id}</span>
@@ -247,6 +247,12 @@ export default function TicketDetailPage() {
         <StatusBadge status={ticket.status} />
         <span>·</span>
         <span>última actualización {formatDate(ticket.updatedAt)}</span>
+      </div>
+
+      <div className="back-bar">
+        <Link to="/tickets" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
+          ← Volver
+        </Link>
       </div>
     </div>
   );

@@ -10,8 +10,8 @@ type FieldErrors = Partial<Record<FieldName, string>>;
 
 /** Límites alineados con los DTO del backend, para avisar antes de enviar. */
 const LIMITS = {
-  title: { min: 5, max: 200 },
-  description: { min: 10, max: 5000 },
+  title: { min: 5, max: 150 },
+  description: { min: 10, max: 3000 },
 };
 
 /**
@@ -114,20 +114,10 @@ export default function NewTicketPage() {
   }
 
   return (
-    <div className="stack" style={{ maxWidth: 680 }}>
-      <div className="row" style={{ justifyContent: 'space-between' }}>
-        <h1>Nuevo ticket</h1>
-        <Link to="/tickets" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
-          ← Volver a tickets
-        </Link>
-      </div>
+    <div className="stack">
+      <h1>Nuevo Ticket</h1>
 
       <div className="card" style={{ padding: '1.5rem' }}>
-        <p className="muted" style={{ marginTop: 0 }}>
-          Al crearlo se envía a n8n, que lo clasifica y devuelve prioridad, categoría y
-          etiquetas. Verás el resultado en el detalle en cuanto llegue.
-        </p>
-
         <form onSubmit={handleSubmit} noValidate>
           {formError && (
             <div className="alert" role="alert" style={{ marginBottom: '1rem' }}>
@@ -142,6 +132,7 @@ export default function NewTicketPage() {
             <input
               id="title"
               className="input"
+              maxLength={LIMITS.title.max}
               value={title}
               onChange={(e) => {
                 setTitle(e.target.value);
@@ -169,7 +160,8 @@ export default function NewTicketPage() {
             <textarea
               id="description"
               className="textarea"
-              rows={6}
+              rows={8}
+              maxLength={LIMITS.description.max}
               value={description}
               onChange={(e) => {
                 setDescription(e.target.value);
@@ -185,8 +177,7 @@ export default function NewTicketPage() {
               </span>
             ) : (
               <span className="hint" id="description-hint">
-                {description.trim().length}/{LIMITS.description.max} caracteres · cuanto más
-                detalle, mejor clasifica n8n
+                {description.trim().length}/{LIMITS.description.max} caracteres
               </span>
             )}
           </div>
@@ -233,6 +224,12 @@ export default function NewTicketPage() {
             )}
           </button>
         </form>
+      </div>
+
+      <div className="back-bar">
+        <Link to="/tickets" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
+          ← Volver
+        </Link>
       </div>
     </div>
   );
