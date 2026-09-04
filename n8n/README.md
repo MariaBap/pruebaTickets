@@ -7,16 +7,16 @@ nada, ni siquiera como respaldo.
 ## Qué hace
 
 ```
-[Webhook: ticket creado] → [Clasificar por reglas] → [Callback a la API]
+[Webhook] → [Enriquecimiento] → [Callback]
 ```
 
-1. **Webhook: ticket creado** — `POST /webhook/ticket-created`. Recibe
+1. **Webhook** — `POST /webhook/ticket-created`. Recibe
    `{ ticketId, title, description, createdAt }` que envía la API al crear un
    ticket.
-2. **Clasificar por reglas** — nodo Code. Normaliza el texto a minúsculas y sin
+2. **Enriquecimiento** — nodo Code. Normaliza el texto a minúsculas y sin
    tildes y aplica reglas por palabras clave para deducir `category`, `priority`
    y `tags`.
-3. **Callback a la API** — `POST` al endpoint de enriquecimiento con la cabecera
+3. **Callback** — `POST` al endpoint de enriquecimiento con la cabecera
    `X-Webhook-Secret`, enviando `{ ticketId, priority, category, tags }`.
 
 No hay nodo de IA y el flujo no produce `suggestedReply`: la respuesta sugerida

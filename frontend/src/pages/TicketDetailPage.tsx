@@ -206,12 +206,6 @@ export default function TicketDetailPage() {
             </select>
           </Row>
 
-          {!puedeCambiarEstado && (
-            <p className="hint" style={{ margin: '-0.25rem 0 0.5rem' }}>
-              Solo quien tiene el ticket asignado puede cambiar su estado.
-            </p>
-          )}
-
           <Row label="Asignado a">
             {isAdmin ? (
               <select
