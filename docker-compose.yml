@@ -1,0 +1,129 @@
+# ---------------------------------------------------------------------------
+# CrazySupportHub — las cuatro piezas de la entrega.
+#
+#   docker compose up --build
+#
+#   Frontend  http://localhost:5173
+#   API       http://localhost:3000/api
+#   n8n       http://localhost:5678
+#
+# Dentro de esta red los servicios se llaman por su nombre. Solo el navegador
+# del host usa localhost, y por eso VITE_API_URL es la única URL que lo lleva.
+# ---------------------------------------------------------------------------
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: crazysupporthub-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      # 5433 por defecto para no chocar con un Postgres ya instalado en el host.
+      - '${POSTGRES_PORT:-5433}:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Importa y publica el workflow antes de que n8n arranque. Va en un servicio
+  # aparte porque n8n solo registra los webhooks de los workflows publicados al
+  # iniciarse: hacerlo con n8n ya en marcha exigiría reiniciarlo.
+  n8n-init:
+    image: docker.n8n.io/n8nio/n8n:${N8N_VERSION:-2.36.9}
+    container_name: crazysupporthub-n8n-init
+    restart: 'no'
+    environment:
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      N8N_DIAGNOSTICS_ENABLED: 'false'
+    volumes:
+      - n8n-data:/home/node/.n8n
+      - ./n8n/workflow.json:/workflows/workflow.json:ro
+    # El comando va como un unico elemento de lista: si se escribe como cadena
+    # suelta, Compose la trocea en palabras y `sh -c` recibe solo "n8n" como
+    # script, lo que arranca el servidor en vez de importar el workflow.
+    entrypoint: ['/bin/sh', '-c']
+    command:
+      - >-
+        n8n import:workflow --input=/workflows/workflow.json &&
+        n8n publish:workflow --id=crazySupportHub1
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:${N8N_VERSION:-2.36.9}
+    container_name: crazysupporthub-n8n
+    restart: unless-stopped
+    depends_on:
+      n8n-init:
+        condition: service_completed_successfully
+    environment:
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      GENERIC_TIMEZONE: ${GENERIC_TIMEZONE:-America/Caracas}
+      N8N_DIAGNOSTICS_ENABLED: 'false'
+      N8N_SECURE_COOKIE: 'false'
+      # Obligatorio: n8n bloquea el acceso a $env en las expresiones por
+      # defecto, y sin esto el nodo del callback se queda sin URL ni secreto y
+      # falla con "access to env vars denied", dejando el ticket en processing.
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: 'false'
+      # Las lee el workflow con $env. `backend` es el nombre del servicio.
+      BACKEND_CALLBACK_URL: http://backend:3000/api/webhooks/n8n/enrichment
+      N8N_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET}
+    ports:
+      - '${N8N_PORT:-5678}:5678'
+    volumes:
+      - n8n-data:/home/node/.n8n
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    container_name: crazysupporthub-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # Se define aquí y no se hereda del .env porque dentro de la red el host
+      # es `postgres`, mientras que el .env apunta a localhost para el
+      # desarrollo fuera de Docker.
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      # Mismo motivo: aquí el host es `n8n`, no localhost.
+      N8N_WEBHOOK_URL: http://n8n:5678/webhook/ticket-created
+      N8N_WEBHOOK_SECRET: ${N8N_WEBHOOK_SECRET}
+      N8N_WEBHOOK_TIMEOUT_MS: ${N8N_WEBHOOK_TIMEOUT_MS:-5000}
+    ports:
+      - '${BACKEND_PORT:-3000}:3000'
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://localhost:3000/api/health']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+      args:
+        # La URL la usa el navegador del host, así que es localhost. Vite la
+        # incrusta al construir, no al arrancar.
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api}
+    container_name: crazysupporthub-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - '${FRONTEND_PORT:-5173}:80'
+
+volumes:
+  postgres-data:
+  n8n-data:
