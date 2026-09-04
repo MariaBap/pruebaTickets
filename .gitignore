@@ -36,3 +36,5 @@ prueba.txt
 
 # Cliente de Prisma generado
 apps/backend/generated/
+
+# Base de datos de los tests e2e (se crea sola al ejecutarlos)
