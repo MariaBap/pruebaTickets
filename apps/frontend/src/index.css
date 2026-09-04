@@ -6,8 +6,8 @@
   --border: #e3e6ea;
   --text: #1a1d21;
   --text-muted: #6b7280;
-  --brand: #4f46e5;
-  --brand-hover: #4338ca;
+  --brand: #4d7c0f;
+  --brand-hover: #3f6212;
   --danger: #dc2626;
   --danger-bg: #fef2f2;
 
@@ -16,8 +16,8 @@
   --pending-bg: #fffbeb;
   --processing: #1d4ed8;
   --processing-bg: #eff6ff;
-  --done: #15803d;
-  --done-bg: #f0fdf4;
+  --done: #0f766e;
+  --done-bg: #f0fdfa;
   --failed: #b91c1c;
   --failed-bg: #fef2f2;
   --neutral: #4b5563;

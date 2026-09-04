@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 
 export function Layout() {
@@ -22,35 +22,13 @@ export function Layout() {
             gap: '1.25rem',
           }}
         >
+          {/* El nombre es también la vuelta al inicio; sin pestañas de menú. */}
           <Link
             to="/tickets"
             style={{ fontWeight: 700, color: 'var(--text)', textDecoration: 'none' }}
           >
             CrazySupportHub
           </Link>
-
-          <nav className="row" style={{ gap: '0.9rem' }}>
-            <NavLink
-              to="/tickets"
-              style={({ isActive }) => ({
-                color: isActive ? 'var(--brand)' : 'var(--text-muted)',
-                fontWeight: isActive ? 600 : 400,
-                textDecoration: 'none',
-              })}
-            >
-              Tickets
-            </NavLink>
-            <NavLink
-              to="/tickets/nuevo"
-              style={({ isActive }) => ({
-                color: isActive ? 'var(--brand)' : 'var(--text-muted)',
-                fontWeight: isActive ? 600 : 400,
-                textDecoration: 'none',
-              })}
-            >
-              Nuevo ticket
-            </NavLink>
-          </nav>
 
           <div className="row" style={{ marginLeft: 'auto', gap: '0.75rem' }}>
             <span className="row" style={{ gap: '0.4rem' }}>

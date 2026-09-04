@@ -63,10 +63,9 @@ export default function LoginPage() {
   return (
     <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '1.5rem' }}>
       <div className="card" style={{ width: '100%', maxWidth: 380, padding: '1.75rem' }}>
-        <h1 style={{ marginBottom: '0.25rem' }}>CrazySupportHub</h1>
-        <p className="muted" style={{ marginTop: 0, marginBottom: '1.5rem' }}>
-          Inicia sesión para gestiónar los tickets.
-        </p>
+        <h1 style={{ textAlign: 'center', fontWeight: 800, marginBottom: '1.75rem' }}>
+          CrazySupportHub
+        </h1>
 
         <form onSubmit={handleSubmit} noValidate>
           {formError && (

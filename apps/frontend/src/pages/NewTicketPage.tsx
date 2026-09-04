@@ -118,7 +118,7 @@ export default function NewTicketPage() {
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <h1>Nuevo ticket</h1>
         <Link to="/tickets" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
-          Cancelar
+          ← Volver a tickets
         </Link>
       </div>
 
@@ -223,20 +223,15 @@ export default function NewTicketPage() {
             </div>
           )}
 
-          <div className="row" style={{ gap: '0.6rem' }}>
-            <button type="submit" className="btn" disabled={createTicket.isPending}>
-              {createTicket.isPending ? (
-                <span className="row">
-                  <Spinner /> <span style={{ marginLeft: '0.5rem' }}>Creando…</span>
-                </span>
-              ) : (
-                'Crear ticket'
-              )}
-            </button>
-            <Link to="/tickets" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
-              Cancelar
-            </Link>
-          </div>
+          <button type="submit" className="btn" disabled={createTicket.isPending}>
+            {createTicket.isPending ? (
+              <span className="row">
+                <Spinner /> <span style={{ marginLeft: '0.5rem' }}>Creando…</span>
+              </span>
+            ) : (
+              'Crear ticket'
+            )}
+          </button>
         </form>
       </div>
     </div>

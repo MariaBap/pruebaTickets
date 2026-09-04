@@ -10,8 +10,6 @@ import {
   PRIORITY_LABELS,
   STATUS_LABELS,
 } from '../api/labels';
-import { Spinner } from './States';
-
 export function StatusBadge({ status }: { status: TicketStatus }) {
   return <span className="badge">{STATUS_LABELS[status]}</span>;
 }
@@ -34,15 +32,14 @@ export function CategoryBadge({ category }: { category: TicketCategory | null })
 
 /**
  * El estado del enriquecimiento es lo que hace visible la integración con n8n,
- * así que los cuatro estados se distinguen a simple vista y los dos que aún
- * están en curso llevan un indicador de actividad.
+ * así que los cuatro estados se distinguen por color a simple vista.
  */
 export function EnrichmentBadge({ status }: { status: EnrichmentStatus }) {
-  const tone = `badge-${status}`;
-  const inProgress = status === 'pending' || status === 'processing';
   return (
-    <span className={`badge ${tone}`} title={`Enriquecimiento: ${ENRICHMENT_LABELS[status]}`}>
-      {inProgress && <Spinner />}
+    <span
+      className={`badge badge-${status}`}
+      title={`Enriquecimiento: ${ENRICHMENT_LABELS[status]}`}
+    >
       {ENRICHMENT_LABELS[status]}
     </span>
   );
