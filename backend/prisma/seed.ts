@@ -22,7 +22,7 @@ import {
  */
 
 const BCRYPT_ROUNDS = 10;
-const SEED_FILE = join(__dirname, '..', '..', '..', 'tickets-seed.json');
+const SEED_FILE = join(__dirname, '..', '..', 'tickets-seed.json');
 
 interface SeedUser {
   id: number;

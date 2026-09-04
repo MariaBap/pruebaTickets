@@ -10,13 +10,13 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,test}/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "test:e2e": "dotenv -e ../../.env -- jest --config ./test/jest-e2e.json --runInBand",
+    "test:e2e": "dotenv -e ../.env -- jest --config ./test/jest-e2e.json --runInBand",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "dotenv -e ../../.env -- prisma migrate dev",
-    "prisma:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
-    "prisma:seed": "dotenv -e ../../.env -- prisma db seed",
-    "prisma:studio": "dotenv -e ../../.env -- prisma studio",
-    "prisma:reset": "dotenv -e ../../.env -- prisma migrate reset --force"
+    "prisma:migrate": "dotenv -e ../.env -- prisma migrate dev",
+    "prisma:deploy": "dotenv -e ../.env -- prisma migrate deploy",
+    "prisma:seed": "dotenv -e ../.env -- prisma db seed",
+    "prisma:studio": "dotenv -e ../.env -- prisma studio",
+    "prisma:reset": "dotenv -e ../.env -- prisma migrate reset --force"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

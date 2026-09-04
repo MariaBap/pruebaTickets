@@ -9,9 +9,7 @@ export const TEST_DATABASE_NAME = 'crazysupporthub_test';
 /** Devuelve la URL de la base de tests a partir de la de desarrollo. */
 export function testDatabaseUrl(baseUrl = process.env.DATABASE_URL): string {
   if (!baseUrl) {
-    throw new Error(
-      'Falta DATABASE_URL. Ejecuta los tests con `npm run test:e2e -w apps/backend`.',
-    );
+    throw new Error('Falta DATABASE_URL. Ejecuta los tests con `npm run test:e2e -w backend`.');
   }
 
   const url = new URL(baseUrl);
