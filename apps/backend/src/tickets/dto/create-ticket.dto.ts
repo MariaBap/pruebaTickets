@@ -12,7 +12,7 @@ import { HasMeaningfulText } from '../../common/validators/has-meaningful-text.v
  */
 export class CreateTicketDto {
   @IsString({ message: 'El título es obligatorio.' })
-  @MinLength(5, { message: 'El título debe tener al menos 5 caracteres.' })
+  @MinLength(10, { message: 'El título debe tener al menos 10 caracteres.' })
   @MaxLength(150, { message: 'El título no puede superar los 150 caracteres.' })
   @HasMeaningfulText({
     message: 'El título debe incluir texto, no solo números, espacios o símbolos.',

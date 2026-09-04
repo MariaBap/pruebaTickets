@@ -9,11 +9,12 @@ import {
 /**
  * Mínimo de letras que debe contener un texto para considerarse informativo.
  *
- * Con una sola letra pasarían cosas como "a 12345"; con tres, un título como
- * "IVA 21% en la factura" o "Error 500 al exportar" sigue siendo válido, y
- * quedan fuera "12345", "!!!!", "   " y "1 - 2 - 3".
+ * Con un umbral bajo se colaban cosas como "L 22222 aa": cumple la cuenta
+ * pero no forma ninguna palabra. Con cinco hace falta al menos una palabra
+ * real o dos cortas, y siguen entrando títulos legítimos como
+ * "Error 500 al exportar" o "IVA duplicado en la factura 2026".
  */
-export const MIN_LETTERS = 3;
+export const MIN_LETTERS = 5;
 
 /**
  * `\p{L}` cubre cualquier letra Unicode, así que acepta tildes y eñes igual

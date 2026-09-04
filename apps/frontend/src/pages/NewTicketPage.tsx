@@ -15,7 +15,7 @@ type FieldErrors = Partial<Record<FieldName, string>>;
  * números, símbolos o espacios no informa a nadie ni al clasificador de n8n.
  * `\p{L}` cubre cualquier letra Unicode, tildes y eñes incluidas.
  */
-const MIN_LETTERS = 3;
+const MIN_LETTERS = 5;
 
 function countLetters(value: string): number {
   return (value.match(/\p{L}/gu) ?? []).length;
@@ -23,7 +23,7 @@ function countLetters(value: string): number {
 
 /** Límites alineados con los DTO del backend, para avisar antes de enviar. */
 const LIMITS = {
-  title: { min: 5, max: 150 },
+  title: { min: 10, max: 150 },
   description: { min: 10, max: 3000 },
 };
 
