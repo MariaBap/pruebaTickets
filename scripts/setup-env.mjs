@@ -3,12 +3,6 @@
  * Genera el archivo `.env` a partir de `.env.example`, rellenando cada
  * marcador con un valor aleatorio.
  *
- * Existe porque `.env.example` no puede traer valores reales —el repositorio no
- * contiene secretos— y a la vez arrancar el proyecto no debería exigir que
- * nadie se invente a mano una cadena de 32 caracteres. Sin esto, quien clona el
- * repositorio y levanta el compose sin rellenar el archivo ve a Postgres caerse
- * con el usuario en blanco, y el error no explica la causa.
- *
  *   npm run setup:env            crea .env si no existe
  *   npm run setup:env -- --force lo regenera, perdiendo los valores actuales
  */

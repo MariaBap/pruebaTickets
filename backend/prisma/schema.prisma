@@ -1,6 +1,3 @@
-// CrazySupportHub — modelo de datos.
-// Derivado de los campos del enunciado y de la forma concreta de tickets-seed.json.
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -37,8 +34,6 @@ enum TicketCategory {
   other
 }
 
-/// Ciclo de vida del enriquecimiento que produce el workflow de n8n.
-/// pending -> processing (webhook despachado) -> done (callback valido) | failed
 enum EnrichmentStatus {
   pending
   processing
@@ -51,8 +46,6 @@ model User {
   name  String @db.VarChar(120)
   email String @unique @db.VarChar(180)
 
-  /// Hash bcrypt. La contrasena en texto plano nunca se persiste:
-  /// tickets-seed.json la trae en claro y el seed la hashea al insertar.
   passwordHash String @db.VarChar(60)
 
   role Role @default(agent)
@@ -75,26 +68,19 @@ model Ticket {
   createdById Int
   createdBy   User @relation("TicketCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
 
-  /// Nulo mientras el ticket no tiene responsable asignado.
   assignedToId Int?
   assignedTo   User? @relation("TicketAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
 
-  // --- Campos de enriquecimiento: los llena el callback de n8n ---------------
-  // Nulos hasta que el workflow clasifica. El backend NUNCA los deriva por su
-  // cuenta: la clasificacion vive en n8n.
   priority       TicketPriority?
   category       TicketCategory?
   tags           String[]        @default([])
-  suggestedReply String?         @db.Text
-
+  
   enrichmentStatus EnrichmentStatus @default(pending)
   enrichedAt       DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Indices que sostienen el listado avanzado (filtros + ordenamiento) y el
-  // scoping por rol, que se aplica dentro del where de la consulta.
   @@index([status])
   @@index([priority])
   @@index([category])

@@ -1,6 +1,6 @@
 # Workflow de n8n — CrazySupportHub
 
-`workflow.json` contiene el flujo que clasifica y enriquece los tickets. Es la
+`CrazySupportHubWorkflow.json` contiene el flujo que clasifica y enriquece los tickets. Es la
 pieza que el enunciado exige que viva **dentro de n8n**: el backend no clasifica
 nada, ni siquiera como respaldo.
 
@@ -40,7 +40,7 @@ Con `docker compose up` el workflow se importa y se publica automáticamente.
 Para hacerlo a mano en una instancia de n8n ya corriendo:
 
 ```bash
-docker cp n8n/workflow.json <contenedor-n8n>:/tmp/workflow.json
+docker cp n8n/CrazySupportHubWorkflow.json <contenedor-n8n>:/tmp/workflow.json
 docker exec <contenedor-n8n> n8n import:workflow --input=/tmp/workflow.json
 docker exec <contenedor-n8n> n8n publish:workflow --id=crazySupportHub1
 docker restart <contenedor-n8n>
@@ -95,4 +95,4 @@ enriquecidos, y reproducen los 8 exactamente. El orden de evaluación importa:
 Bastaría insertar un nodo de modelo entre el Code y el HTTP Request, que reciba
 título y descripción y devuelva el mismo JSON más `suggestedReply`. La API ya
 acepta ese campo en el callback: no habría que tocar el backend. La API key
-iría en una credencial de n8n, nunca en `workflow.json`.
+iría en una credencial de n8n, nunca en `CrazySupportHubWorkflow.json`.

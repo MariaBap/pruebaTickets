@@ -1,5 +1,4 @@
 {
-  "id": "crazySupportHub1",
   "name": "CrazySupportHub",
   "nodes": [
     {
@@ -59,6 +58,7 @@
       "name": "Callback"
     }
   ],
+  "pinData": {},
   "connections": {
     "Webhook": {
       "main": [
@@ -83,10 +83,16 @@
       ]
     }
   },
+  "active": true,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "active": false,
-  "pinData": {},
+  "versionId": "fb3a1ddc-8125-4a6f-b255-5f60e0af3210",
+  "meta": {
+    "instanceId": "d16b431ded9d9db061a971b2f15b3c77f7e7443627cd46d811317dc5b01a4b1a"
+  },
+  "nodeGroups": [],
+  "id": "crazySupportHub1",
   "tags": []
 }

@@ -43,7 +43,7 @@ services:
       N8N_DIAGNOSTICS_ENABLED: 'false'
     volumes:
       - n8n-data:/home/node/.n8n
-      - ./n8n/workflow.json:/workflows/workflow.json:ro
+      - ./n8n/CrazySupportHubWorkflow.json:/workflows/workflow.json:ro
     # El comando va como un unico elemento de lista: si se escribe como cadena
     # suelta, Compose la trocea en palabras y `sh -c` recibe solo "n8n" como
     # script, lo que arranca el servidor en vez de importar el workflow.
