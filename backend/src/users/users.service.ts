@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Role, User } from '../../generated/prisma';
 
 /** Campos publicos de un usuario: nunca incluye passwordHash. */
-export const USER_PUBLIC_FIELDS = {
+const USER_PUBLIC_FIELDS = {
   id: true,
   name: true,
   email: true,

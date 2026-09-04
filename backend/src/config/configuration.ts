@@ -2,8 +2,7 @@
  * Configuracion tipada derivada de las variables de entorno ya validadas.
  * El resto de la aplicacion lee de aqui y nunca de `process.env` directamente.
  */
-export interface AppConfig {
-  nodeEnv: 'development' | 'test' | 'production';
+interface AppConfig {
   port: number;
   corsOrigin: string;
   jwt: {
@@ -18,7 +17,6 @@ export interface AppConfig {
 }
 
 export default (): AppConfig => ({
-  nodeEnv: process.env.NODE_ENV as AppConfig['nodeEnv'],
   port: parseInt(process.env.PORT as string, 10),
   corsOrigin: process.env.CORS_ORIGIN as string,
   jwt: {

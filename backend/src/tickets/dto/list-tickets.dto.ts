@@ -7,8 +7,8 @@ import {
   TicketStatus,
 } from '../../../generated/prisma';
 
-export const SORTABLE_FIELDS = ['createdAt', 'updatedAt', 'title', 'status', 'priority'] as const;
-export type SortableField = (typeof SORTABLE_FIELDS)[number];
+const SORTABLE_FIELDS = ['createdAt', 'updatedAt', 'title', 'status', 'priority'] as const;
+type SortableField = (typeof SORTABLE_FIELDS)[number];
 
 export class ListTicketsQueryDto {
   // --- Filtros --------------------------------------------------------------

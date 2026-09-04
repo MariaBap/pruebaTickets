@@ -2,36 +2,20 @@ import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import { getErrorMessage, getFieldErrors } from '../api/client';
+import { splitServerErrors } from '../api/field-errors';
 import { ALLOWED_EMAIL_DOMAIN } from '../api/labels';
 import { FullPageLoader, Spinner } from '../components/States';
+import { PasswordField } from '../components/PasswordField';
 
 type FieldName = 'name' | 'email' | 'password';
 type FieldErrors = Partial<Record<FieldName, string>>;
 
-/**
- * Reparte por campo los errores que devuelve la API. El backend contesta con
- * una lista de mensajes; sin este reparto todos acabarían en el aviso general
- * en vez de debajo del campo que los provoca.
- */
-function mapServerErrors(messages: string[]): { fields: FieldErrors; rest: string[] } {
-  const fields: FieldErrors = {};
-  const rest: string[] = [];
-
-  for (const message of messages) {
-    const lower = message.toLowerCase();
-    if (lower.includes('nombre')) {
-      fields.name ??= message;
-    } else if (lower.includes('correo')) {
-      fields.email ??= message;
-    } else if (lower.includes('contraseña')) {
-      fields.password ??= message;
-    } else {
-      rest.push(message);
-    }
-  }
-
-  return { fields, rest };
-}
+/** Qué campo reclama cada mensaje de error de la API. */
+const FIELD_MATCHERS = [
+  ['name', /nombre/i],
+  ['email', /correo/i],
+  ['password', /contraseña/i],
+] as const satisfies ReadonlyArray<readonly [FieldName, RegExp]>;
 
 export default function RegisterPage() {
   const { user, loading, register } = useAuth();
@@ -40,7 +24,6 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -103,7 +86,7 @@ export default function RegisterPage() {
     } catch (error) {
       const serverMessages = getFieldErrors(error);
       if (serverMessages.length > 0) {
-        const { fields, rest } = mapServerErrors(serverMessages);
+        const { fields, rest } = splitServerErrors(serverMessages, FIELD_MATCHERS);
         setErrors(fields);
         setFormError(rest.length > 0 ? rest.join(' ') : null);
       } else {
@@ -174,77 +157,18 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <div className="field">
-            <label className="label" htmlFor="password">
-              Contraseña
-            </label>
-            <div className="input-with-action">
-              <input
-                id="password"
-                className="input"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  clearError('password');
-                }}
-                aria-invalid={Boolean(errors.password)}
-                aria-describedby={errors.password ? 'password-error' : 'password-hint'}
-              />
-              <button
-                type="button"
-                className="input-action"
-                onClick={() => setShowPassword((current) => !current)}
-                aria-label={showPassword ? 'Ocultar la contraseña' : 'Mostrar la contraseña'}
-                aria-pressed={showPassword}
-                title={showPassword ? 'Ocultar la contraseña' : 'Mostrar la contraseña'}
-              >
-                {showPassword ? (
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 3l18 18" />
-                    <path d="M10.6 10.6a2 2 0 002.8 2.8" />
-                    <path d="M9.4 5.2A9.5 9.5 0 0112 5c5 0 9 4.5 9 7 0 .9-.6 2.1-1.6 3.3" />
-                    <path d="M6.2 6.7C3.9 8.2 3 10.3 3 12c0 2.5 4 7 9 7 1.4 0 2.6-.3 3.7-.8" />
-                  </svg>
-                ) : (
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z" />
-                    <circle cx="12" cy="12" r="2.5" />
-                  </svg>
-                )}
-              </button>
-            </div>
-            {errors.password ? (
-              <span className="field-error" id="password-error">
-                {errors.password}
-              </span>
-            ) : (
-              <span className="hint" id="password-hint">
-                Mínimo 8 caracteres, con al menos una letra y un número.
-              </span>
-            )}
-          </div>
+          <PasswordField
+            id="password"
+            label="Contraseña"
+            value={password}
+            autoComplete="new-password"
+            error={errors.password}
+            hint="Mínimo 8 caracteres, con al menos una letra y un número."
+            onChange={(value) => {
+              setPassword(value);
+              clearError('password');
+            }}
+          />
 
           <button type="submit" className="btn" style={{ width: '100%' }} disabled={submitting}>
             {submitting ? (
@@ -267,7 +191,7 @@ export default function RegisterPage() {
               textDecoration: 'none',
             }}
           >
-            Ya tengo cuenta
+            Ya tengo una cuenta
           </Link>
         </form>
       </div>

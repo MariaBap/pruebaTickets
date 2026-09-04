@@ -26,7 +26,7 @@ export class N8nDispatcherSpy {
   }
 }
 
-export interface TestContext {
+interface TestContext {
   app: INestApplication;
   prisma: PrismaService;
   n8n: N8nDispatcherSpy;

@@ -2,9 +2,9 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { createTestApp, resetDatabase, seedUsers, type SeededUser } from './utils/test-app';
+import { WEBHOOK_SECRET_HEADER } from '../src/webhooks/guards/webhook-secret.guard';
 
 const CALLBACK = '/api/webhooks/n8n/enrichment';
-const SECRET_HEADER = 'X-Webhook-Secret';
 
 describe('Callback de enriquecimiento de n8n (e2e)', () => {
   let app: INestApplication;
@@ -54,7 +54,7 @@ describe('Callback de enriquecimiento de n8n (e2e)', () => {
     it('responde 401 con un secreto incorrecto', async () => {
       await request(app.getHttpServer())
         .post(CALLBACK)
-        .set(SECRET_HEADER, 'secreto-incorrecto')
+        .set(WEBHOOK_SECRET_HEADER, 'secreto-incorrecto')
         .send(payload())
         .expect(401);
     });
@@ -67,7 +67,7 @@ describe('Callback de enriquecimiento de n8n (e2e)', () => {
       const mismoLargo = 'x'.repeat(secret.length);
       await request(app.getHttpServer())
         .post(CALLBACK)
-        .set(SECRET_HEADER, mismoLargo)
+        .set(WEBHOOK_SECRET_HEADER, mismoLargo)
         .send(payload())
         .expect(401);
     });
@@ -93,7 +93,7 @@ describe('Callback de enriquecimiento de n8n (e2e)', () => {
 
       const secretoMalo = await request(app.getHttpServer())
         .post(CALLBACK)
-        .set(SECRET_HEADER, 'otro')
+        .set(WEBHOOK_SECRET_HEADER, 'otro')
         .send(payload())
         .expect(401);
 
@@ -110,7 +110,8 @@ describe('Callback de enriquecimiento de n8n (e2e)', () => {
   });
 
   describe('validación del payload', () => {
-    const conSecreto = () => request(app.getHttpServer()).post(CALLBACK).set(SECRET_HEADER, secret);
+    const conSecreto = () =>
+      request(app.getHttpServer()).post(CALLBACK).set(WEBHOOK_SECRET_HEADER, secret);
 
     it('responde 404 si el ticket no existe', async () => {
       await conSecreto()
@@ -144,7 +145,8 @@ describe('Callback de enriquecimiento de n8n (e2e)', () => {
   });
 
   describe('enriquecimiento correcto', () => {
-    const conSecreto = () => request(app.getHttpServer()).post(CALLBACK).set(SECRET_HEADER, secret);
+    const conSecreto = () =>
+      request(app.getHttpServer()).post(CALLBACK).set(WEBHOOK_SECRET_HEADER, secret);
 
     it('persiste el enriquecimiento y pasa el ticket a done', async () => {
       const response = await conSecreto().send(payload()).expect(200);

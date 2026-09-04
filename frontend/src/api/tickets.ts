@@ -24,7 +24,7 @@ export interface TicketFilters {
  * Los filtros forman parte de la clave de cache: cambiar un filtro es otra
  * consulta, no la misma con otro resultado.
  */
-export const ticketKeys = {
+const ticketKeys = {
   all: ['tickets'] as const,
   list: (filters: TicketFilters) => ['tickets', 'list', filters] as const,
   detail: (id: number) => ['tickets', 'detail', id] as const,
@@ -74,7 +74,7 @@ export function useUsers(enabled: boolean) {
   });
 }
 
-export interface CreateTicketInput {
+interface CreateTicketInput {
   title: string;
   description: string;
   assignedToId?: number;
@@ -93,7 +93,7 @@ export function useCreateTicket() {
   });
 }
 
-export interface UpdateTicketInput {
+interface UpdateTicketInput {
   status?: TicketStatus;
   assignedToId?: number | null;
 }

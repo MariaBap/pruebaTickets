@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCreateTicket, useUsers } from '../api/tickets';
 import { getErrorMessage, getFieldErrors } from '../api/client';
+import { splitServerErrors } from '../api/field-errors';
 import { useAuth } from '../auth/useAuth';
 import { ROLE_LABELS } from '../api/labels';
 import { Spinner } from '../components/States';
@@ -27,30 +28,12 @@ const LIMITS = {
   description: { min: 10, max: 3000 },
 };
 
-/**
- * Reparte los errores de validación que devuelve la API entre sus campos.
- * El backend contesta con una lista de mensajes; sin este reparto, todos
- * acabarían en el aviso general y no debajo del campo que los provoca.
- */
-function mapServerErrors(messages: string[]): { fields: FieldErrors; rest: string[] } {
-  const fields: FieldErrors = {};
-  const rest: string[] = [];
-
-  for (const message of messages) {
-    const lower = message.toLowerCase();
-    if (lower.includes('título') || lower.includes('titulo')) {
-      fields.title ??= message;
-    } else if (lower.includes('descripción') || lower.includes('descripcion')) {
-      fields.description ??= message;
-    } else if (lower.includes('asignado')) {
-      fields.assignedToId ??= message;
-    } else {
-      rest.push(message);
-    }
-  }
-
-  return { fields, rest };
-}
+/** Qué campo reclama cada mensaje de error de la API. */
+const FIELD_MATCHERS = [
+  ['title', /t[íi]tulo/i],
+  ['description', /descripci[óo]n/i],
+  ['assignedToId', /asignado/i],
+] as const satisfies ReadonlyArray<readonly [FieldName, RegExp]>;
 
 export default function NewTicketPage() {
   const navigate = useNavigate();
@@ -121,7 +104,7 @@ export default function NewTicketPage() {
     } catch (error) {
       const serverMessages = getFieldErrors(error);
       if (serverMessages.length > 0) {
-        const { fields, rest } = mapServerErrors(serverMessages);
+        const { fields, rest } = splitServerErrors(serverMessages, FIELD_MATCHERS);
         setErrors(fields);
         setFormError(rest.length > 0 ? rest.join(' ') : null);
       } else {
