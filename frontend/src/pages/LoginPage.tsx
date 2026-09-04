@@ -172,7 +172,7 @@ export default function LoginPage() {
 
           <Link
             to="/registro"
-            className="btn btn-secondary"
+            className="btn"
             style={{
               width: '100%',
               marginTop: '0.6rem',

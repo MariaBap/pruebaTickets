@@ -192,18 +192,9 @@ export default function TicketsPage() {
           />
         ) : data.data.length === 0 ? (
           <EmptyState
-            title={hasFilters ? 'Ningún ticket coincide' : 'Todavía no hay tickets'}
+            title={hasFilters ? 'Ningún ticket coincide' : 'No hay tickets'}
             description={
-              hasFilters
-                ? 'Prueba a quitar algún filtro o a cambiar la búsqueda.'
-                : 'Crea el primero para ver aquí cómo n8n lo clasifica.'
-            }
-            action={
-              hasFilters ? undefined : (
-                <Link className="btn" to="/tickets/nuevo" style={{ textDecoration: 'none' }}>
-                  Nuevo Ticket
-                </Link>
-              )
+              hasFilters ? 'Prueba a quitar algún filtro o a cambiar la búsqueda.' : undefined
             }
           />
         ) : (

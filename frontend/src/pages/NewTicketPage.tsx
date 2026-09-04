@@ -82,7 +82,7 @@ export default function NewTicketPage() {
     const cleanDescription = description.trim();
 
     if (!cleanTitle) {
-      next.title = 'El título es obligatorio.';
+      next.title = 'Campo obligatorio';
     } else if (cleanTitle.length < LIMITS.title.min) {
       next.title = `El título debe tener al menos ${LIMITS.title.min} caracteres.`;
     } else if (cleanTitle.length > LIMITS.title.max) {
@@ -92,7 +92,7 @@ export default function NewTicketPage() {
     }
 
     if (!cleanDescription) {
-      next.description = 'La descripción es obligatoria.';
+      next.description = 'Campo obligatorio';
     } else if (cleanDescription.length < LIMITS.description.min) {
       next.description = `La descripción debe tener al menos ${LIMITS.description.min} caracteres.`;
     } else if (cleanDescription.length > LIMITS.description.max) {
