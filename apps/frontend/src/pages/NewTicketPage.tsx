@@ -169,7 +169,7 @@ export default function NewTicketPage() {
               }}
               aria-invalid={Boolean(errors.description)}
               aria-describedby={errors.description ? 'description-error' : 'description-hint'}
-              placeholder="Cuenta qué ocurre, qué esperabas y qué has probado"
+              placeholder="Describe el problema"
             />
             {errors.description ? (
               <span className="field-error" id="description-error">

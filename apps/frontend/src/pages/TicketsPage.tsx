@@ -199,11 +199,7 @@ export default function TicketsPage() {
                 : 'Crea el primero para ver aquí cómo n8n lo clasifica.'
             }
             action={
-              hasFilters ? (
-                <button type="button" className="btn btn-secondary" onClick={clearFilters}>
-                  Borrar Filtros
-                </button>
-              ) : (
+              hasFilters ? undefined : (
                 <Link className="btn" to="/tickets/nuevo" style={{ textDecoration: 'none' }}>
                   Nuevo Ticket
                 </Link>
