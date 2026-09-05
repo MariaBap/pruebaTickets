@@ -51,6 +51,31 @@ n8n aparte, con `npx n8n` o Docker, e importando `n8n/CrazySupportHubWorkflow.js
 
 ---
 
+## Decisiones técnicas
+
+**NestJS en vez de Express.** El proyecto tiene tres cosas distintas que decidir en cada
+petición: si hay sesión, si el rol permite llamar a ese endpoint, y qué tickets puede ver
+esa persona. Con los guards de Nest cada una queda en su sitio y se puede probar por
+separado. Con Express habría terminado escribiendo ese mismo andamiaje a mano y mezclado
+dentro de los controladores.
+
+**Prisma como ORM, fijado en la 6.19.3.** El esquema genera los tipos, así que si cambio
+una columna y olvido actualizar el código, no compila en lugar de fallar en ejecución. Lo
+fijé en la 6 porque no me parecía buena idea montar la entrega sobre una versión no estable.
+
+**Cómo modelé el enriquecimiento.** Los campos que devuelve n8n (`priority`, `category`,
+`tags`, `suggestedReply`) están en la misma tabla de tickets, nulos hasta que el flujo
+responde, más un `enrichmentStatus` que va de `pending` a `processing` y de ahí a `done` o
+`failed`, y un `enrichedAt` con la fecha. 
+
+**Cómo manejo el estado asíncrono en el front.** Con TanStack Query y un
+`refetchInterval` condicional, mientras el ticket está en `pending` o `processing`
+consulta cada 2 segundos, y en cuanto llega a `done` o `failed` deja de consultar solo. 
+Usé sondeo y no WebSockets porque el enunciado lo permite y no compensa mantener una
+conexión abierta para un evento que ocurre una sola vez por ticket.
+
+---
+
 ## Uso de IA
 
 Utilice Claude Code como herramienta de trabajo, primero hice a mano algunos de los archivos 
